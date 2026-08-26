@@ -64,11 +64,15 @@ class SetupScriptTests(unittest.TestCase):
                 for skill in SKILL_NAMES:
                     self.assertTrue((home / relative / skill / "SKILL.md").is_file())
 
+            locations = home.parent / f"{home.name}-locations.env"
             injected = (home / ".codex" / "skills" / "unknown-info" / "SKILL.md").read_text(encoding="utf-8")
-            self.assertIn("HOMELAB=/private/homelab/docs", injected)
+            self.assertIn(str(locations.resolve()), injected)
             self.assertIn("Canonical file", injected)
+            self.assertNotIn("HOMELAB=/private/homelab/docs", injected)
+            self.assertNotIn("Current contents", injected)
             preferred = (home / ".codex" / "skills" / "preferred-tools" / "SKILL.md").read_text(encoding="utf-8")
-            self.assertIn("HOMELAB=/private/homelab/docs", preferred)
+            self.assertIn(str(locations.resolve()), preferred)
+            self.assertNotIn("HOMELAB=/private/homelab/docs", preferred)
             self.assertIn("location-key: PREFERRED_TOOLS", preferred)
             self.assertNotIn("locations-index: setup.py replaces", preferred)
 
@@ -218,6 +222,28 @@ class SetupScriptTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("newer than local", result.stdout)
             self.assertEqual((home / ".codex" / "AGENTS.md").read_text(encoding="utf-8"), remote_text)
+
+    def test_index_content_changes_do_not_reinstall(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            first = self.run_setup(home, "--all")
+            self.assertEqual(first.returncode, 0, first.stderr)
+            skill = home / ".codex" / "skills" / "unknown-info" / "SKILL.md"
+            original_mtime = skill.stat().st_mtime_ns
+
+            locations = home.parent / f"{home.name}-locations.env"
+            locations.write_text(
+                "# Updated\nHOMELAB=/other/homelab\nNEW_KEY=/private/new\n",
+                encoding="utf-8",
+            )
+            second = self.run_setup(home, "--all")
+            self.assertEqual(second.returncode, 0, second.stderr)
+            self.assertIn("codex: up to date", second.stdout)
+            self.assertIn("0 of 6 harness(es) changed", second.stdout)
+            self.assertEqual(skill.stat().st_mtime_ns, original_mtime)
+            injected = skill.read_text(encoding="utf-8")
+            self.assertNotIn("NEW_KEY", injected)
+            self.assertNotIn("/other/homelab", injected)
 
     def test_locations_index_is_required_and_validated(self):
         with tempfile.TemporaryDirectory() as directory:

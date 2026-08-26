@@ -40,8 +40,6 @@ class Harness:
 @dataclass(frozen=True)
 class LocationsIndex:
     path: Path
-    content: str
-    keys: tuple[str, ...]
 
 
 HARNESSES = (
@@ -182,21 +180,18 @@ def load_locations_index(path: Path) -> LocationsIndex:
             raise InstallerError(f"Empty locations index value on line {number}: {key}")
         keys.append(key)
 
-    normalized = content.rstrip() + "\n"
-    return LocationsIndex(canonical, normalized, tuple(keys))
+    return LocationsIndex(canonical)
 
 
 def render_location_aware_skill(source: Path, locations: LocationsIndex) -> bytes:
     body = source.read_text(encoding="utf-8").rstrip() + "\n"
     if body.count(LOCATIONS_MARKER) != 1:
         raise InstallerError(f"Location-aware skill must contain exactly one locations marker: {source}")
-    indented_content = "\n".join(f"    {line}" if line else "" for line in locations.content.splitlines())
     injected = (
         "## Installed locations index\n\n"
         "Canonical file (write new mappings here):\n\n"
         f"    {locations.path}\n\n"
-        "Current contents:\n\n"
-        f"{indented_content}\n"
+        "Read this file for current mappings. Values that are not absolute are relative to its directory.\n"
     )
     return body.replace(LOCATIONS_MARKER, injected).encode("utf-8")
 
@@ -217,8 +212,6 @@ def installation_fingerprint(source: Path, locations: LocationsIndex) -> str:
     digest.update(directory_fingerprint(source).encode("ascii"))
     digest.update(b"\0")
     digest.update(os.fspath(locations.path).encode("utf-8"))
-    digest.update(b"\0")
-    digest.update(locations.content.encode("utf-8"))
     return digest.hexdigest()
 
 

@@ -14,7 +14,7 @@ python3 setup.py /path/to/locations.env
 py setup.py C:\path\to\locations.env
 ```
 
-Before running setup, obtain the `locations_index_file` path from the user; ask for it when it has not already been provided. The file is an external dotenv-style registry such as `HOMELAB=/path/to/homelab/docs`, and must not contain credentials or be committed to this repository.
+Before running setup, obtain the `locations_index_file` path from the user; ask for it when it has not already been provided. The file is an external dotenv-style registry such as `HOMELAB=homelab`. Values may be absolute, or relative to the directory that contains the index file. It must not contain credentials or be committed to this repository. Setup injects only that file's path into location-aware skills; index content changes do not require re-running setup.
 
 By default, the script detects installed harnesses, fetches the current branch from `origin`, and uses that revision only when it is strictly ahead of the local checkout. If the fetch fails, the histories diverge, or the local checkout is already current or ahead, it uses the local `global/` directory.
 

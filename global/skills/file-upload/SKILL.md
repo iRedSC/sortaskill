@@ -7,7 +7,7 @@ metadata:
 
 # File upload
 
-Read `FILE_UPLOAD` from the injected locations index, then read that file and follow its publishing workflow.
+Read the locations index at the injected path, look up `FILE_UPLOAD`, then read that file and follow its publishing workflow.
 
 If the key or file does not exist, interview the user before uploading anything. Ask which service or local workflow they use, where its instructions should live, and what authorization or replacement rules apply. Create the instructions and append `FILE_UPLOAD=<location>` to the canonical index after they confirm.
 

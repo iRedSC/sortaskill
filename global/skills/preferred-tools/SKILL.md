@@ -7,7 +7,7 @@ metadata:
 
 # Preferred tools
 
-Read `PREFERRED_TOOLS` from the injected locations index, then read that file before comparing candidates.
+Read the locations index at the injected path, look up `PREFERRED_TOOLS`, then read that file before comparing candidates.
 
 If the key or file does not exist, interview the user before recommending anything. Ask only what affects this choice and future ones, such as their existing stack, hard exclusions, operating constraints, and which tradeoffs matter most. Ask where the preference file should live when the key is missing. Create it and append `PREFERRED_TOOLS=<location>` to the canonical index after they answer.
 

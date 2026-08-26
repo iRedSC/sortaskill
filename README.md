@@ -22,10 +22,11 @@ Treat the agent like a capable engineer entering a codebase for the first time. 
 Create a private locations index outside this repository:
 
 ```dotenv
-HOMELAB=/path/to/homelab/docs
+HOMELAB=homelab
+PREFERRED_TOOLS=preferred_tools.md
 ```
 
-Values point to machine-specific context. Do not put credentials in the file or commit it.
+Values may be absolute, or relative to the directory that contains the index file. Do not put credentials in the file or commit it to this repository.
 
 ```sh
 python3 setup.py /path/to/locations.env
