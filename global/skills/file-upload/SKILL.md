@@ -1,26 +1,16 @@
 ---
 name: file-upload
-description: Use when the user asks to publish or share a local image or video through the configured Uplord service. Do not invoke merely to display a local file.
+description: Use when the user asks to publish or share a local file through their configured upload service. Do not invoke merely to display a local file.
+metadata:
+  location-key: FILE_UPLOAD
 ---
 
-# File Upload
+# File upload
 
-Publish only files the user authorized sharing. Read `UPLORD_URL` and `UPLORD_UPLOAD_KEY` from the environment; never print, copy, or embed the key.
+Read `FILE_UPLOAD` from the injected locations index, then read that file and follow its publishing workflow.
 
-## Workflow
+If the key or file does not exist, interview the user before uploading anything. Ask which service or local workflow they use, where its instructions should live, and what authorization or replacement rules apply. Create the instructions and append `FILE_UPLOAD=<location>` to the canonical index after they confirm.
 
-1. Resolve each requested local file and confirm it exists.
-2. Upload one file to a human-readable folder path:
+Publish only files the user authorized sharing. Never print or copy upload credentials. Return the resulting shareable location.
 
-   ```sh
-   curl --fail-with-body --silent --show-error \
-     --request POST \
-     --header "Authorization: Bearer $UPLORD_UPLOAD_KEY" \
-     --form "file=@FILE" \
-     "$UPLORD_URL/api/uploads/bundu/images?random=1"
-   ```
-
-3. Prefer `random=1`; it replaces the filename with a UUID, making the public URL harder to guess but not private.
-4. Return the public `url` from the JSON response.
-
-Uploading the same filename to a folder replaces it. Do not replace a file unless the user requested it or clearly authorized the replacement.
+<!-- locations-index: setup.py replaces this comment in installed copies -->
