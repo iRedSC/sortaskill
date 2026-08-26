@@ -1,0 +1,5 @@
+html/
+locations.env
+.locations.env
+__pycache__/
+*.py[cod]

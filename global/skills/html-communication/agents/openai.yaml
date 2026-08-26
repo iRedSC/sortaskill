@@ -1,0 +1,4 @@
+interface:
+  display_name: "HTML Communication"
+  short_description: "Create a standalone visual HTML artifact"
+  default_prompt: "Use $html-communication to create a standalone HTML artifact for this request."

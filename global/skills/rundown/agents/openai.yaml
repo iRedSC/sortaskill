@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rundown"
+  short_description: "Quickly assess a code change before implementation"
+  default_prompt: "Use $rundown to review this request and outline the problem, proposed solution, and touch points."
