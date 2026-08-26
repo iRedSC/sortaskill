@@ -67,6 +67,10 @@ class SetupScriptTests(unittest.TestCase):
             injected = (home / ".codex" / "skills" / "unknown-info" / "SKILL.md").read_text(encoding="utf-8")
             self.assertIn("HOMELAB=/private/homelab/docs", injected)
             self.assertIn("Canonical file", injected)
+            preferred = (home / ".codex" / "skills" / "preferred-tools" / "SKILL.md").read_text(encoding="utf-8")
+            self.assertIn("HOMELAB=/private/homelab/docs", preferred)
+            self.assertIn("location-key: PREFERRED_TOOLS", preferred)
+            self.assertNotIn("locations-index: setup.py replaces", preferred)
 
     def test_unmanaged_skill_collision_is_preserved(self):
         with tempfile.TemporaryDirectory() as directory:

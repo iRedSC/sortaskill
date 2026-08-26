@@ -186,10 +186,10 @@ def load_locations_index(path: Path) -> LocationsIndex:
     return LocationsIndex(canonical, normalized, tuple(keys))
 
 
-def render_unknown_info(source: Path, locations: LocationsIndex) -> bytes:
+def render_location_aware_skill(source: Path, locations: LocationsIndex) -> bytes:
     body = source.read_text(encoding="utf-8").rstrip() + "\n"
     if body.count(LOCATIONS_MARKER) != 1:
-        raise InstallerError(f"unknown-info skill must contain exactly one locations marker: {source}")
+        raise InstallerError(f"Location-aware skill must contain exactly one locations marker: {source}")
     indented_content = "\n".join(f"    {line}" if line else "" for line in locations.content.splitlines())
     injected = (
         "## Installed locations index\n\n"
@@ -347,8 +347,9 @@ def copy_skill(
         remove_path(destination, False)
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(source, destination)
-    if source.name == "unknown-info":
-        write_atomic(destination / "SKILL.md", render_unknown_info(source / "SKILL.md", locations), False)
+    skill_entrypoint = source / "SKILL.md"
+    if LOCATIONS_MARKER in skill_entrypoint.read_text(encoding="utf-8"):
+        write_atomic(destination / "SKILL.md", render_location_aware_skill(skill_entrypoint, locations), False)
     return True
 
 
@@ -358,9 +359,10 @@ def tree_contains_source(source: Path, destination: Path, locations: LocationsIn
     for source_file in (path for path in source.rglob("*") if path.is_file()):
         destination_file = destination / source_file.relative_to(source)
         try:
+            content = source_file.read_text(encoding="utf-8") if source_file.name == "SKILL.md" else ""
             expected = (
-                render_unknown_info(source_file, locations)
-                if source.name == "unknown-info" and source_file.name == "SKILL.md"
+                render_location_aware_skill(source_file, locations)
+                if LOCATIONS_MARKER in content
                 else source_file.read_bytes()
             )
             if not destination_file.is_file() or destination_file.read_bytes() != expected:
