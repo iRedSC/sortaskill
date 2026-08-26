@@ -1,6 +1,6 @@
 ---
 name: file-upload
-description: Use when the user asks to publish or share a local file through their configured upload service. Do not invoke merely to display a local file.
+description: Use when the user asks to publish or share a local file through their configured upload service, or when user says "LINK" with no context. Do not invoke merely to display a local file.
 metadata:
   location-key: FILE_UPLOAD
 ---

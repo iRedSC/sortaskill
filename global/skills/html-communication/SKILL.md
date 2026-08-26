@@ -11,4 +11,4 @@ Write it to the user-facing output location supplied by the environment. If none
 
 ## Publishing
 
-Publish only when the user requests a shareable URL. Use the `file-upload` skill for the publishing workflow.
+Publish only when the user requests a shareable URL. Use the `file-upload` skill for the publishing workflow. If the user says "LINK", always upload the file.
