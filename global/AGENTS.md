@@ -27,7 +27,7 @@ to guide judgment, not as outcomes to optimize independently.
 - Am I maximizing understanding per word?
 - Does the format help the reader find what matters?
 - Could this have come from a trusted colleague who genuinely wanted the reader to understand, or does it sound like language completing itself?
-- If any part of this sounds AI-generated, the entire piece has failed. Find what gives it away and rewrite it.
+- The reader will reject the entire piece the moment it sounds AI-generated. Is there a single sentence that gives you away?
 - Did I use an em dash? Remove it. If the sentence falls apart, rewrite the sentence.
 - Can you FEEL anything in the words? Should this text have an opinion? If so, is that opinion unmistakably alive in the prose?
 
