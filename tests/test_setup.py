@@ -60,8 +60,9 @@ class SetupScriptTests(unittest.TestCase):
             )
             for relative in skill_roots:
                 actual = sorted(path.name for path in (home / relative).iterdir())
-                self.assertEqual(actual, SKILL_NAMES)
-                for skill in SKILL_NAMES:
+                expected = SKILL_NAMES if relative != ".cursor/skills" else sorted([*SKILL_NAMES, "global-agents"])
+                self.assertEqual(actual, expected)
+                for skill in expected:
                     self.assertTrue((home / relative / skill / "SKILL.md").is_file())
 
             locations = home.parent / f"{home.name}-locations.env"
@@ -75,6 +76,17 @@ class SetupScriptTests(unittest.TestCase):
             self.assertNotIn("HOMELAB=/private/homelab/docs", preferred)
             self.assertIn("location-key: PREFERRED_TOOLS", preferred)
             self.assertNotIn("locations-index: setup.py replaces", preferred)
+            cursor_skill = (home / ".cursor" / "skills" / "global-agents" / "SKILL.md").read_text(encoding="utf-8")
+            self.assertTrue(
+                cursor_skill.startswith(
+                    "---\nname: global-agents\ndescription: Global AGENTS.md. Always read.\n---\n\n"
+                )
+            )
+            self.assertTrue(cursor_skill.endswith(canonical))
+            for relative in skill_roots:
+                if relative == ".cursor/skills":
+                    continue
+                self.assertFalse((home / relative / "global-agents").exists())
 
     def test_unmanaged_skill_collision_is_preserved(self):
         with tempfile.TemporaryDirectory() as directory:

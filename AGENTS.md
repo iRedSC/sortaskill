@@ -51,6 +51,7 @@ The scheduled command fetches `origin`, but only rewrites a harness when its sel
 # Maintain the installer
 
 - Edit global instructions in `global/AGENTS.md` and skills in `global/skills/<name>/SKILL.md`.
+- Cursor also receives `global/AGENTS.md` as a generated skill named `global-agents`. Setup writes it only to that harness; do not add a copy under `global/skills/`.
 - A skill that requires a specific directory must declare its dotenv lookup key as `metadata.location-key` in `SKILL.md`. Its instructions must say to ask the user and append the mapping to the canonical index when that key is undefined.
 - Add or change harness paths in `HARNESSES` in `setup.py`; keep all paths relative to the user's home directory.
 - Maintain scheduler integrations in `automation.py`; installation and removal must remain per-user operations.

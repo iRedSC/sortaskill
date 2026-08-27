@@ -23,6 +23,13 @@ import zipfile
 MINIMUM_PYTHON = (3, 9)
 MANIFEST_VERSION = 2
 CURSOR_FRONTMATTER = "---\ndescription: Global agent instructions\nalwaysApply: true\n---\n\n"
+CURSOR_AGENTS_SKILL = "global-agents"
+CURSOR_AGENTS_SKILL_FRONTMATTER = (
+    "---\n"
+    f"name: {CURSOR_AGENTS_SKILL}\n"
+    "description: Global AGENTS.md. Always read.\n"
+    "---\n\n"
+)
 LOCATIONS_MARKER = "<!-- locations-index: setup.py replaces this comment in installed copies -->"
 LOCATION_KEY = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
@@ -196,6 +203,21 @@ def render_location_aware_skill(source: Path, locations: LocationsIndex) -> byte
     return body.replace(LOCATIONS_MARKER, injected).encode("utf-8")
 
 
+def cursor_agents_skill_bytes(source: Path) -> bytes:
+    body = (source / "AGENTS.md").read_text(encoding="utf-8").rstrip() + "\n"
+    return (CURSOR_AGENTS_SKILL_FRONTMATTER + body).encode("utf-8")
+
+
+def generated_skill_names(harness: Harness) -> set[str]:
+    if harness.name == "cursor":
+        return {CURSOR_AGENTS_SKILL}
+    return set()
+
+
+def expected_skill_names(harness: Harness, source_skills: Iterable[str]) -> set[str]:
+    return set(source_skills) | generated_skill_names(harness)
+
+
 def directory_fingerprint(source: Path) -> str:
     digest = hashlib.sha256()
     for path in sorted(candidate for candidate in source.rglob("*") if candidate.is_file()):
@@ -346,6 +368,27 @@ def copy_skill(
     return True
 
 
+def install_generated_skill(
+    content: bytes,
+    destination: Path,
+    repo: Path,
+    managed: bool,
+    force: bool,
+    dry_run: bool,
+) -> bool:
+    exists = destination.exists() or destination.is_symlink()
+    replaceable = managed or is_legacy_repo_link(destination, repo)
+    if exists and not replaceable and not force:
+        log(f"  Warning: skipped unmanaged skill collision at {destination} (use --force to replace it)")
+        return False
+    if dry_run:
+        return True
+    if exists:
+        remove_path(destination, False)
+    write_atomic(destination / "SKILL.md", content, False)
+    return True
+
+
 def tree_contains_source(source: Path, destination: Path, locations: LocationsIndex) -> bool:
     if not destination.is_dir():
         return False
@@ -377,7 +420,7 @@ def harness_is_current(
         return False
 
     source_skills = {path.name: path for path in (source / "skills").iterdir() if path.is_dir()}
-    if set(entry.get("skills", [])) != set(source_skills):
+    if set(entry.get("skills", [])) != expected_skill_names(harness, source_skills):
         return False
 
     if harness.instructions is not None:
@@ -388,7 +431,17 @@ def harness_is_current(
         except OSError:
             return False
 
-    return all(tree_contains_source(skill, home / harness.skills / name, locations) for name, skill in source_skills.items())
+    if not all(tree_contains_source(skill, home / harness.skills / name, locations) for name, skill in source_skills.items()):
+        return False
+
+    if harness.name == "cursor":
+        skill = home / harness.skills / CURSOR_AGENTS_SKILL / "SKILL.md"
+        try:
+            if skill.read_bytes() != cursor_agents_skill_bytes(source):
+                return False
+        except OSError:
+            return False
+    return True
 
 
 def sync_harness(
@@ -410,8 +463,9 @@ def sync_harness(
     skill_root = home / harness.skills
     source_skills = {path.name: path for path in (source / "skills").iterdir() if path.is_dir()}
     previously_managed = set(previous_skills)
+    expected_names = expected_skill_names(harness, source_skills)
 
-    for stale_name in sorted(previously_managed - source_skills.keys()):
+    for stale_name in sorted(previously_managed - expected_names):
         stale = skill_root / stale_name
         if stale.exists() or stale.is_symlink():
             remove_path(stale, dry_run)
@@ -421,7 +475,7 @@ def sync_harness(
     # broken or stale links from that layout without touching unrelated entries.
     if skill_root.is_dir():
         for candidate in skill_root.iterdir():
-            if candidate.name not in source_skills and is_legacy_repo_link(candidate, repo):
+            if candidate.name not in expected_names and is_legacy_repo_link(candidate, repo):
                 remove_path(candidate, dry_run)
                 log(f"  removed stale legacy skill link: {candidate.name}")
 
@@ -438,6 +492,17 @@ def sync_harness(
             locations,
         ):
             installed.append(name)
+    if harness.name == "cursor":
+        destination = skill_root / CURSOR_AGENTS_SKILL
+        if install_generated_skill(
+            cursor_agents_skill_bytes(source),
+            destination,
+            repo,
+            CURSOR_AGENTS_SKILL in previously_managed,
+            force,
+            dry_run,
+        ):
+            installed.append(CURSOR_AGENTS_SKILL)
     log(f"  skills -> {skill_root} ({len(installed)} installed)")
     return installed
 
