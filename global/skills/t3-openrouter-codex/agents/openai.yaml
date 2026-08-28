@@ -1,0 +1,6 @@
+interface:
+  display_name: "OpenRouter Codex"
+  short_description: "Set up a dedicated OpenRouter Codex in T3"
+  default_prompt: "Use $t3-openrouter-codex to set up a dedicated OpenRouter Codex instance on this machine. Say if you also want the GLM flash profile."
+policy:
+  allow_implicit_invocation: false
