@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Create the Codex home on this machine. Tell the user the T3 form values. Do not operate the T3 UI unless they ask. Never print `OPENROUTER_API_KEY`.
 
-Leave `~/.codex` as the ChatGPT home. Install the `glm-flash` profile only when this invocation asked for GLM. If it did, follow [glm-flash.md](glm-flash.md) after the OpenRouter home is in place.
+Leave `~/.codex` as the ChatGPT home.
 
 ## Preconditions
 
@@ -29,7 +29,6 @@ Home: `$HOME/.codex-openrouter`. Expand `$HOME` before writing paths.
 5. If `~/.codex/skills` exists, replace `<home>/skills` with a symlink to it unless that symlink is already in place. If `<home>/skills` has user content besides a Codex `.system` directory, ask first.
 6. If `~/.codex/AGENTS.md` exists, symlink it to `<home>/AGENTS.md`.
 7. Run `CODEX_HOME=<home> codex doctor --json`. Config must load, `model provider` must be `openrouter`, and OpenAI auth must not be required.
-8. If this invocation asked for GLM, follow [glm-flash.md](glm-flash.md).
 
 ```toml
 model_provider = "openrouter"
@@ -72,5 +71,3 @@ If OpenRouter models also appear on the default Codex instance, tell them to add
 - Copy `~/.codex/auth.json` into the OpenRouter home
 - Put `--profile` in T3 launch arguments
 - Combine `env_key` with `auth.command`
-- Add a T3 instance for GLM. It is a CLI profile on `~/.codex`, not a second T3 Codex.
-- Install `glm-flash` unless this invocation asked for it

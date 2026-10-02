@@ -41,9 +41,21 @@ class SetupScriptTests(unittest.TestCase):
                 ".config/opencode/AGENTS.md",
                 ".copilot/copilot-instructions.md",
             )
-            canonical = (REPO / "global" / "AGENTS.md").read_text(encoding="utf-8").rstrip() + "\n"
+            source = (REPO / "global" / "AGENTS.md").read_text(encoding="utf-8")
+            start, end = "<!-- skip-harness: codex -->\n", "<!-- /skip-harness -->\n"
+            self.assertIn(start, source)
+            before, rest = source.split(start, 1)
+            block, after = rest.split(end, 1)
+            canonical = (before + block + after).rstrip() + "\n"
+            codex_canonical = (before + after).rstrip() + "\n"
             for relative in instruction_paths:
                 installed = (home / relative).read_text(encoding="utf-8")
+                self.assertNotIn("skip-harness", installed)
+                if relative == ".codex/AGENTS.md":
+                    self.assertEqual(installed, codex_canonical)
+                    self.assertNotIn("codex exec", installed)
+                    continue
+                self.assertIn("codex exec", installed)
                 if relative.endswith(".mdc"):
                     self.assertTrue(installed.startswith("---\n"))
                     self.assertTrue(installed.endswith(canonical))

@@ -74,6 +74,7 @@ Questions are read-only unless they explicitly request a change.
 Proceed autonomously with ordinary reversible implementation work. Ask before
 destructive, externally consequential, or difficult-to-recover actions.
 
+<!-- skip-harness: codex -->
 # Subagents
 
 For exploratory subagent work (searching a codebase, reading across many
@@ -86,3 +87,4 @@ codex exec -m gpt-6.1-sol -s read-only --skip-git-repo-check -C "$workspace" \
 ```
 
 Give it a self-contained prompt, keep its conclusions, and skip the file dumps.
+<!-- /skip-harness -->

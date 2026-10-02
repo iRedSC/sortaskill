@@ -32,6 +32,12 @@ CURSOR_AGENTS_SKILL_FRONTMATTER = (
 )
 LOCATIONS_MARKER = "<!-- locations-index: setup.py replaces this comment in installed copies -->"
 LOCATION_KEY = re.compile(r"^[A-Z][A-Z0-9_]*$")
+# Wrap AGENTS.md text in these markers to keep it out of the named harnesses,
+# e.g. instructions that call that harness and would make it recurse.
+SKIP_HARNESS_BLOCK = re.compile(
+    r"^<!-- skip-harness: ([a-z, ]+) -->\n(.*?)^<!-- /skip-harness -->\n?",
+    re.DOTALL | re.MULTILINE,
+)
 
 
 @dataclass(frozen=True)
@@ -203,8 +209,24 @@ def render_location_aware_skill(source: Path, locations: LocationsIndex) -> byte
     return body.replace(LOCATIONS_MARKER, injected).encode("utf-8")
 
 
+def render_instructions(source: Path, harness_name: str) -> str:
+    """Return AGENTS.md for one harness, dropping blocks marked to skip it."""
+
+    def replace(match: re.Match) -> str:
+        skipped = {name.strip() for name in match.group(1).split(",")}
+        unknown = skipped - {harness.name for harness in HARNESSES}
+        if unknown:
+            raise InstallerError(f"Unknown harness in skip-harness marker: {', '.join(sorted(unknown))}")
+        return "" if harness_name in skipped else match.group(2)
+
+    body = SKIP_HARNESS_BLOCK.sub(replace, source.read_text(encoding="utf-8"))
+    if "skip-harness" in body:
+        raise InstallerError(f"Unbalanced skip-harness marker in {source}")
+    return body.rstrip() + "\n"
+
+
 def cursor_agents_skill_bytes(source: Path) -> bytes:
-    body = (source / "AGENTS.md").read_text(encoding="utf-8").rstrip() + "\n"
+    body = render_instructions(source / "AGENTS.md", "cursor")
     return (CURSOR_AGENTS_SKILL_FRONTMATTER + body).encode("utf-8")
 
 
@@ -247,9 +269,9 @@ def available_harnesses(home: Path, install_all: bool) -> list[Harness]:
     ]
 
 
-def instruction_bytes(source: Path, instruction_format: str) -> bytes:
-    body = source.read_text(encoding="utf-8").rstrip() + "\n"
-    if instruction_format == "cursor-mdc":
+def instruction_bytes(source: Path, harness: Harness) -> bytes:
+    body = render_instructions(source, harness.name)
+    if harness.instruction_format == "cursor-mdc":
         body = CURSOR_FRONTMATTER + body
     return body.encode("utf-8")
 
@@ -426,7 +448,7 @@ def harness_is_current(
     if harness.instructions is not None:
         destination = home / harness.instructions
         try:
-            if destination.read_bytes() != instruction_bytes(source / "AGENTS.md", harness.instruction_format):
+            if destination.read_bytes() != instruction_bytes(source / "AGENTS.md", harness):
                 return False
         except OSError:
             return False
@@ -457,7 +479,7 @@ def sync_harness(
     log(f"{harness.name}:")
     if harness.instructions is not None:
         destination = home / harness.instructions
-        write_atomic(destination, instruction_bytes(source / "AGENTS.md", harness.instruction_format), dry_run)
+        write_atomic(destination, instruction_bytes(source / "AGENTS.md", harness), dry_run)
         log(f"  instructions -> {destination}")
 
     skill_root = home / harness.skills
