@@ -53,9 +53,9 @@ class SetupScriptTests(unittest.TestCase):
                 self.assertNotIn("skip-harness", installed)
                 if relative == ".codex/AGENTS.md":
                     self.assertEqual(installed, codex_canonical)
-                    self.assertNotIn("codex exec", installed)
+                    self.assertNotIn("delegate_task", installed)
                     continue
-                self.assertIn("codex exec", installed)
+                self.assertIn("delegate_task", installed)
                 if relative.endswith(".mdc"):
                     self.assertTrue(installed.startswith("---\n"))
                     self.assertTrue(installed.endswith(canonical))

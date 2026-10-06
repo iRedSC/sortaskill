@@ -78,13 +78,10 @@ destructive, externally consequential, or difficult-to-recover actions.
 # Subagents
 
 For exploratory subagent work (searching a codebase, reading across many
-files, answering "where/how does X work"), call Codex with `gpt-6.1-sol`
-instead of exploring inline:
-
-```sh
-codex exec -m gpt-6.1-sol -s read-only --skip-git-repo-check -C "$workspace" \
-  '<exploration task>' </dev/null
-```
+files, answering "where/how does X work"), delegate to Codex `gpt-6.1-sol`
+through T3 Code's `delegate_task` tool instead of exploring inline. Use
+`target: {"providerInstanceId": "codex", "model": "gpt-6.1-sol"}`. If
+`delegate_task` is unavailable, explore inline.
 
 Give it a self-contained prompt, keep its conclusions, and skip the file dumps.
 <!-- /skip-harness -->
