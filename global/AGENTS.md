@@ -1,4 +1,4 @@
-# About me
+# What I want
 
 - Make mistakes structurally impossible. Lint and tests help, but the code itself should prevent wrong use through types, explicit states, and APIs that can't be misused.
 - Finish the experience, not just the task. Anything the user triggers needs visible feedback. Example: blocking a modal close over unsaved edits without saying why is a bug.
