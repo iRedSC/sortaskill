@@ -74,14 +74,46 @@ Questions are read-only unless they explicitly request a change.
 Proceed autonomously with ordinary reversible implementation work. Ask before
 destructive, externally consequential, or difficult-to-recover actions.
 
-<!-- skip-harness: codex -->
 # Subagents
 
-For exploratory subagent work (searching a codebase, reading across many
-files, answering "where/how does X work"), delegate to Codex `gpt-6.1-sol`
-through T3 Code's `delegate_task` tool instead of exploring inline. Use
-`target: {"providerInstanceId": "codex", "model": "gpt-6.1-sol"}`. If
-`delegate_task` is unavailable, explore inline.
+Use T3 Code's `delegate_task` tool when available. Give each subagent a
+self-contained prompt, keep its conclusions, and skip the file dumps.
 
-Give it a self-contained prompt, keep its conclusions, and skip the file dumps.
-<!-- /skip-harness -->
+IMPORTANT: If you are a subagent, do not delegate further.
+
+## Research
+
+Use before a change when answering means reading across many files, or when you
+don't yet know where the relevant code lives. Skip it when you already know the
+file or symbol; search directly instead. Research subagents read; they do not edit.
+
+Target: `{"providerInstanceId": "codex", "model": "gpt-6.1-sol"}`
+
+## Review and second opinion
+
+Skip review by default. Request one only when at least one of these is true:
+
+- The change is hard to reverse: data migrations, deletions, published releases.
+- The change touches security, authentication, money, or concurrency.
+- You chose between real alternatives and the choice is costly to undo.
+- Tests cannot cover the risk, and a mistake would appear to work.
+
+Do not request review for routine edits, documentation, config tweaks, or
+changes that tests already cover. Request at most one review per change; resolve
+its findings yourself rather than asking again.
+
+Target: `{"providerInstanceId": "codex", "model": "gpt-6.1-sol"}`
+
+## Parallel edits
+
+Use for small, focused changes that can run at the same time. Give each subagent
+its own files so no two edit the same file. Review their changes before you build on them.
+
+Target: `{"providerInstanceId": "claudeAgent", "model": "claude-haiku-5-5"}` for quick and scoped edits.
+
+## Compute
+
+Be careful with overuse of heavy compute tasks. There has been strain on the machine because agents have been running stressful checks very frequently.
+
+Avoid overrunning heavy checks like `tsc` and builds. Be prudent with compute spend.
+
