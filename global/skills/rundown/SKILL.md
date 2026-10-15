@@ -1,20 +1,12 @@
 ---
 name: rundown
-description: Use when the user asks for a rundown of a code change before implementation.
+description: Use when the user asks for a rundown of anything: a planned change, a diff, a bug, a PR, a codebase area, or a decision. Do not edit files or begin implementation.
 ---
 
 # Rundown
 
-Review the request, then inspect only enough code to ground the response. Trace the primary path, nearby types or callers, and relevant tests. Do not edit files or begin implementation.
+Inspect only enough to ground every claim. For a planned change, trace the primary path, nearby callers, and relevant tests.
 
-Return two concise sections:
+Deliver everything critical the user needs to know as separate bite-sized pieces of 2-4 sentences each. Lead each piece with a short bold label. Cover the problem or current state, what you'd do, and any risk or open question that would change their decision. Drop anything that wouldn't.
 
-## Problem
-
-Reiterate the problem in concrete terms, including the expected behavior and the current gap.
-
-## Proposed solution
-
-Describe the simplest cohesive approach. Call out an important tradeoff or uncertainty only when it materially affects the solution.
-
-Keep the response quick and scoped. Do not turn it into a full implementation plan.
+Do not turn it into a full implementation plan.
