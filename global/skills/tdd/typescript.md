@@ -2,7 +2,7 @@
 
 Inspect the package manager, test runner, TypeScript configuration, source and test paths, and CI before recommending changes. Extend the existing harness when it supports the contract.
 
-Explain relevant options to the user before installing or configuring tooling:
+Pick from these when the project has no convention. Ask before installing anything new:
 
 | Need | Options | Recommend when |
 |---|---|---|
@@ -13,6 +13,6 @@ Explain relevant options to the user before installing or configuring tooling:
 | Mutation testing | StrykerJS | Assertion strength justifies the runtime and maintenance cost |
 | Replayable red | Separate red and green commits; CI replay | The project wants proof that tests fail without the implementation |
 
-Recommend the smallest set that proves the requested contract. State setup cost, CI cost, and what each option catches. Do not install tools, add thresholds, or change CI until the user chooses or project instructions require them.
+Recommend the smallest set that proves the requested contract. State setup cost, CI cost, and what each option catches. Do not add thresholds or change CI unless the user or project instructions ask for it.
 
 When selected, preserve failing property-test seeds, cover positive and negative type behavior, and explain mutation exclusions rather than lowering a threshold silently.

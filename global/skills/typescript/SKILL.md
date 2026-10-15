@@ -9,7 +9,7 @@ Model the problem before choosing a TypeScript pattern. Use types to expose real
 
 | Signal | Consider |
 |---|---|
-| Variants have different valid fields or behavior | A discriminated union and exhaustive handling |
+| Variants have different valid fields or behavior | A discriminated union and exhaustive handling. If the variants are stages over time, use the `state-machines` skill |
 | Identical primitives represent domains that must not mix | A branded or opaque type with controlled construction |
 | A loose collection forces assertions or impossible-case throws | A stronger input type or an explicit optional result |
 | Data enters from network, files, environment, persistence, or users | Parse `unknown` once at the boundary, then trust the result |
