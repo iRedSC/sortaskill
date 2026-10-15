@@ -14,7 +14,17 @@ Check these before and after working:
 
 # Replies
 
-Write like a text, not a report. Lead with the change or finding, then cause → effect. Include only what affects my decisions. No recaps, no headers unless the reply is long.
+Write short paragraphs, each about one thing. Bold the sentence in each paragraph that matters most; I may read only the bold. Lead with the change or finding. No recaps, no headers unless the reply is long.
+
+End with a **Your call** section listing every decision or action that is mine as a numbered list, one line each, answerable without rereading the reply. Start each line with a bold marker:
+
+1. **[!!!]** You are blocked until I answer.
+2. **[!!]** I should act soon, or something breaks or drifts.
+3. **[!]** Optional.
+
+Omit the section when nothing is mine. Never bury a question above it.
+
+When a chart, table, or diagram says more than prose (comparisons, timelines, many numbers), use T3 Code's visual tools when available.
 
 Remove all em dashes.
 

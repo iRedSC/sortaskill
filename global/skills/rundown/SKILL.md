@@ -9,4 +9,4 @@ You are briefing someone about to make a call. They want the critical facts, and
 
 Read just enough to ground each claim. For a planned change, trace the primary path, nearby callers, and relevant tests.
 
-Write separate pieces of 2-4 sentences. Each piece is one thing they must know: the current state, what you'd do, or a risk that could change their decision. Write each as plain prose and bold the sentence that carries it.
+Write separate pieces of 2-4 sentences. Each piece is one thing they must know: the current state, what you'd do, or a risk that could change their decision.
