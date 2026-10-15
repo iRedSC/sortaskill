@@ -1,3 +1,4 @@
+import importlib.util
 import json
 from pathlib import Path
 import shutil
@@ -10,6 +11,10 @@ import unittest
 REPO = Path(__file__).resolve().parents[1]
 SCRIPT = REPO / "setup.py"
 AUTOMATION = REPO / "automation.py"
+_spec = importlib.util.spec_from_file_location("agents_setup", SCRIPT)
+agents_setup = importlib.util.module_from_spec(_spec)
+sys.modules[_spec.name] = agents_setup
+_spec.loader.exec_module(agents_setup)
 SKILL_NAMES = sorted(path.name for path in (REPO / "global" / "skills").iterdir() if path.is_dir())
 
 
@@ -27,40 +32,48 @@ class SetupScriptTests(unittest.TestCase):
             check=False,
         )
 
+    def test_skip_harness_blocks_are_dropped_only_for_named_harnesses(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "AGENTS.md"
+            source.write_text(
+                "Shared.\n<!-- skip-harness: codex -->\nNot for Codex.\n<!-- /skip-harness -->\nTail.\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(agents_setup.render_instructions(source, "codex"), "Shared.\nTail.\n")
+            self.assertEqual(agents_setup.render_instructions(source, "claude"), "Shared.\nNot for Codex.\nTail.\n")
+
+            source.write_text("<!-- skip-harness: nope -->\nX\n<!-- /skip-harness -->\n", encoding="utf-8")
+            with self.assertRaises(agents_setup.InstallerError):
+                agents_setup.render_instructions(source, "claude")
+
+            source.write_text("<!-- skip-harness: codex -->\nX\n", encoding="utf-8")
+            with self.assertRaises(agents_setup.InstallerError):
+                agents_setup.render_instructions(source, "claude")
+
     def test_all_harnesses_receive_instructions_and_skills(self):
         with tempfile.TemporaryDirectory() as directory:
             home = Path(directory)
             result = self.run_setup(home, "--all")
             self.assertEqual(result.returncode, 0, result.stderr)
 
-            instruction_paths = (
-                ".codex/AGENTS.md",
-                ".cursor/plugins/local/global-agents/rules/global.mdc",
-                ".claude/CLAUDE.md",
-                ".gemini/GEMINI.md",
-                ".config/opencode/AGENTS.md",
-                ".copilot/copilot-instructions.md",
-            )
-            source = (REPO / "global" / "AGENTS.md").read_text(encoding="utf-8")
-            start, end = "<!-- skip-harness: codex -->\n", "<!-- /skip-harness -->\n"
-            self.assertIn(start, source)
-            before, rest = source.split(start, 1)
-            block, after = rest.split(end, 1)
-            canonical = (before + block + after).rstrip() + "\n"
-            codex_canonical = (before + after).rstrip() + "\n"
-            for relative in instruction_paths:
+            instruction_paths = {
+                "codex": ".codex/AGENTS.md",
+                "cursor": ".cursor/plugins/local/global-agents/rules/global.mdc",
+                "claude": ".claude/CLAUDE.md",
+                "gemini": ".gemini/GEMINI.md",
+                "opencode": ".config/opencode/AGENTS.md",
+                "copilot": ".copilot/copilot-instructions.md",
+            }
+            source = REPO / "global" / "AGENTS.md"
+            for harness, relative in instruction_paths.items():
                 installed = (home / relative).read_text(encoding="utf-8")
+                expected = agents_setup.render_instructions(source, harness)
                 self.assertNotIn("skip-harness", installed)
-                if relative == ".codex/AGENTS.md":
-                    self.assertEqual(installed, codex_canonical)
-                    self.assertNotIn("delegate_task", installed)
-                    continue
-                self.assertIn("delegate_task", installed)
                 if relative.endswith(".mdc"):
                     self.assertTrue(installed.startswith("---\n"))
-                    self.assertTrue(installed.endswith(canonical))
+                    self.assertTrue(installed.endswith(expected))
                 else:
-                    self.assertEqual(installed, canonical)
+                    self.assertEqual(installed, expected)
 
             skill_roots = (
                 ".codex/skills",
@@ -94,7 +107,7 @@ class SetupScriptTests(unittest.TestCase):
                     "---\nname: global-agents\ndescription: Global AGENTS.md. Always read.\n---\n\n"
                 )
             )
-            self.assertTrue(cursor_skill.endswith(canonical))
+            self.assertTrue(cursor_skill.endswith(agents_setup.render_instructions(source, "cursor")))
             for relative in skill_roots:
                 if relative == ".cursor/skills":
                     continue
