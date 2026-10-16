@@ -25,6 +25,10 @@ For each roll:
 
 Each design is its own direction. Do not let one design soften toward the others.
 
+## Materials are all or nothing
+
+A material named in the theme must read as that material on screen, not only in your description. Mercury needs mirror reflections, glass needs refraction and highlights, stone needs texture and weight. Render it convincingly, with one consistent light source, real shadows, and texture, or stylize it deliberately as flat graphics. Never ship the half-real middle: a gray circle labeled mercury is worse than an honest flat drawing.
+
 Typography carries personality. Choose typefaces for this theme, not the families you reach for on every project. Write real copy in plain words; a button says exactly what happens when it is used.
 
 ## Motion is all or nothing
@@ -41,7 +45,11 @@ When you commit, keep it working for everyone: respect `prefers-reduced-motion`,
 
 Put each design in its own directory, such as `designs/<n>-<slug>/index.html`, or follow the project's routing if it already has a framework. Copy [viewer.html](viewer.html) to `designs/index.html` and fill in its `DESIGNS` list. Start a static server in the background, such as `python3 -m http.server` from `designs/`, or use the project's own dev server, and give the user the URL. The viewer switches designs with the arrow keys and shows each design's words, theme, and focal point.
 
-After all five are built, and not before, read [review.md](review.md) and check every design against it at desktop and mobile widths. Fix what it finds before handing over.
+After all five are built, and not before, review them:
+
+1. Save screenshots of each design: full pages at desktop and mobile widths, the first screen alone, and zoomed-in crops of the focal point and each interaction state.
+2. You know what you meant to build, so you will see it in your own screenshots. Have a fresh reviewer judge what is actually there: spawn a subagent that can read images and give it only the brief, each design's theme name, the screenshot paths, and [review.md](review.md). Never give it your descriptions of the designs. If your harness has no subagents, describe each screenshot literally before recalling what you intended, and review against that description.
+3. Fix everything the review finds, then check the fixes yourself against [review.md](review.md). One fresh review per round is enough.
 
 ## Later rounds
 
