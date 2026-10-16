@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Print five theme words picked deterministically from a seed string."""
+"""Print a seed and five theme words picked from it. Omit the seed for a fresh roll."""
 
 import argparse
 import random
+import secrets
 from pathlib import Path
 
 WORDS_FILE = Path(__file__).with_name("words.txt")
@@ -16,9 +17,11 @@ def load_words() -> list[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("seed", help="Any string; the same seed always gives the same words")
+    parser.add_argument("seed", nargs="?", help="Reproduce an earlier roll; the same seed always gives the same words")
     args = parser.parse_args()
-    for word in random.Random(args.seed).sample(load_words(), COUNT):
+    seed = args.seed if args.seed is not None else secrets.token_hex(4)
+    print(f"seed: {seed}")
+    for word in random.Random(seed).sample(load_words(), COUNT):
         print(word)
 
 

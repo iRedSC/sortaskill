@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design round</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #222; font: 14px/1.4 system-ui, sans-serif; }
+  iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
+  .bar {
+    position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 12px; max-width: calc(100% - 32px);
+    padding: 8px 10px; border-radius: 12px; color: #f4f4f4;
+    background: rgba(20, 20, 20, 0.86); backdrop-filter: blur(8px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35); transition: opacity 0.2s, transform 0.2s;
+  }
+  .bar.hidden { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(12px); }
+  .info { min-width: 0; }
+  .title { font-weight: 600; }
+  .meta { color: #b8b8b8; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  button, a {
+    flex: none; padding: 6px 10px; border: 1px solid #555; border-radius: 8px;
+    color: inherit; background: transparent; font: inherit; text-decoration: none; cursor: pointer;
+  }
+  button:hover, a:hover { background: #333; }
+  button:focus-visible, a:focus-visible { outline: 2px solid #8ab4ff; outline-offset: 2px; }
+  .hint { position: fixed; right: 12px; bottom: 12px; color: #fff; font-size: 12px; opacity: 0.6; pointer-events: none; }
+</style>
+</head>
+<body>
+<iframe id="frame" title="Design preview"></iframe>
+<div class="bar" id="bar">
+  <button id="prev" aria-label="Previous design">Prev</button>
+  <div class="info">
+    <div class="title" id="title"></div>
+    <div class="meta" id="meta"></div>
+  </div>
+  <button id="next" aria-label="Next design">Next</button>
+  <a id="open" target="_blank" rel="noopener">Open alone</a>
+  <button id="hide" aria-label="Hide this bar (H)">Hide</button>
+</div>
+<div class="hint" id="hint" hidden>Press H to show controls</div>
+<script>
+  // Fill in one entry per design. path is relative to this file.
+  const DESIGNS = [
+    { name: "Theme name", path: "1-slug/index.html", words: ["Word", "Word", "Word", "Word", "Word"], focal: "The focal point" },
+  ];
+
+  const frame = document.getElementById("frame");
+  const bar = document.getElementById("bar");
+  const hint = document.getElementById("hint");
+  let index = 0;
+
+  function show(next) {
+    index = (next + DESIGNS.length) % DESIGNS.length;
+    const design = DESIGNS[index];
+    frame.src = design.path;
+    document.getElementById("open").href = design.path;
+    document.getElementById("title").textContent = `${index + 1} of ${DESIGNS.length}: ${design.name}`;
+    const meta = document.getElementById("meta");
+    meta.textContent = meta.title = `${design.words.join(", ")}. Focal point: ${design.focal}`;
+    document.title = `${design.name} (${index + 1} of ${DESIGNS.length})`;
+    history.replaceState(null, "", `#${index + 1}`);
+  }
+
+  function toggleBar() {
+    const hidden = bar.classList.toggle("hidden");
+    hint.hidden = !hidden;
+  }
+
+  function onKey(event) {
+    if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
+    if (event.target.closest && event.target.closest("input, textarea, select, [contenteditable]")) return;
+    if (event.key === "ArrowRight") show(index + 1);
+    else if (event.key === "ArrowLeft") show(index - 1);
+    else if (event.key === "h" || event.key === "H") toggleBar();
+  }
+
+  document.getElementById("prev").onclick = () => show(index - 1);
+  document.getElementById("next").onclick = () => show(index + 1);
+  document.getElementById("hide").onclick = toggleBar;
+  window.addEventListener("keydown", onKey);
+  // Keys pressed while a design has focus reach its own document, not this one.
+  frame.addEventListener("load", () => {
+    try { frame.contentWindow.addEventListener("keydown", onKey); } catch { /* cross-origin under file:// */ }
+  });
+
+  const fromHash = parseInt(location.hash.slice(1), 10);
+  show(Number.isInteger(fromHash) ? fromHash - 1 : 0);
+</script>
+</body>
+</html>
