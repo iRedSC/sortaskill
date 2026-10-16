@@ -18,9 +18,10 @@ Make five designs. For each one, run `python3 theme_words.py` from this skill's 
 For each roll:
 
 1. Read the five words and look for what they suggest for this subject: a material, a medium, a mechanism, a mood, a metaphor. Not every word needs to be used. One word may carry the whole design. They are purely for inspiration.
-2. Name a theme and a single focal point that come from that reading.
-3. Choose the medium the theme asks for: paper cutouts, layered collage, subtle 3D, skeuomorphism, realistic objects, or something nobody would expect. Reach for out-of-the-box ideas over safe ones; the page must feel extremely unique.
-4. Wrap everything into a tight, clean page around the focal point. Spend boldness in one place and keep everything around it quiet and disciplined.
+2. Name a theme: a world the whole page lives in. Choose the medium that world asks for: paper cutouts, layered collage, subtle 3D, skeuomorphism, realistic objects, or something nobody would expect. Reach for out-of-the-box ideas over safe ones; the page must feel extremely unique.
+3. Let the theme own the entire page, not one element on it. Do not start from the usual landing-page outline of nav, headline, buttons, features, testimonial, pricing, and footer and then decorate it. Ask what each thing the page must say would be in this world. If the theme is a cartridge case, the page is the console: features are what the reader shows, pricing is the cartridge editions, and the headline is printed on a label.
+4. Decide where the words physically live in that world before laying anything out: stamped into metal, printed on a label, scrawled in a margin, cut from paper. The layout follows from those answers, so each design's first screen should be shaped by its theme.
+5. Choose a focal point: the place a visitor enters the world. Spend boldness there and keep the rest disciplined, so the page reads as one tight, clean thing.
 
 Each design is its own direction. Do not let one design soften toward the others.
 
@@ -28,9 +29,11 @@ Typography carries personality. Choose typefaces for this theme, not the familie
 
 ## Motion is all or nothing
 
-Motion here means scroll craft: elements that travel through depth, images cut apart and moving as pieces, a scene that responds to scrolling, pointer movement, and interaction as one living system. It should feel three-dimensional and alive over time.
+Prefer interaction the visitor drives: things that respond to the pointer, dragging, clicking, and typing, and that change the world rather than decorate it. Movement should feel three-dimensional and alive.
 
-Commit to motion only when you have an extremely confident idea of how the entire page moves as one unified thing. If the theme offers no such idea, skip motion entirely and make each piece straightforward and solid. Never add unrelated animations to fill a budget. Fade-and-slide-up sections, hover lifts on every card, and parallax for its own sake are the cringe this rules out.
+Commit to motion only when you have an extremely confident idea of how the entire page moves as one unified thing. If the theme offers no such idea, skip motion entirely and make each piece straightforward and solid. Never add unrelated animations to fill a budget.
+
+Motion tied to scrolling is the easiest to get wrong, because one screenshot cannot show it. Use it only when the theme demands it, and before keeping it, screenshot at least five scroll positions or record the page scrolling, and judge the motion as a sequence.
 
 When you commit, keep it working for everyone: respect `prefers-reduced-motion`, give touch screens an equivalent with no pointer to follow, animate transforms and opacity so it stays smooth, and keep keyboard focus visible.
 
@@ -38,7 +41,7 @@ When you commit, keep it working for everyone: respect `prefers-reduced-motion`,
 
 Put each design in its own directory, such as `designs/<n>-<slug>/index.html`, or follow the project's routing if it already has a framework. Copy [viewer.html](viewer.html) to `designs/index.html` and fill in its `DESIGNS` list. Start a static server in the background, such as `python3 -m http.server` from `designs/`, or use the project's own dev server, and give the user the URL. The viewer switches designs with the arrow keys and shows each design's words, theme, and focal point.
 
-Screenshot every design at desktop and mobile widths before handing over. Fix anything broken, and rework anything that reads as a template rather than its theme.
+After all five are built, and not before, read [review.md](review.md) and check every design against it at desktop and mobile widths. Fix what it finds before handing over.
 
 ## Later rounds
 
