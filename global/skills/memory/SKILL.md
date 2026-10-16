@@ -15,6 +15,8 @@ If the key is undefined and `~/.memory/INDEX.md` exists, append `MEMORY=<absolut
 
 Read `INDEX.md` before acting. Apply entries scoped `global` or to the current project. Memories are defaults; an instruction in the current conversation wins. When the two conflict, follow the current instruction and propose updating the memory.
 
+If no memory covers a preference-shaped choice, such as picking a tool, ask before recommending. Ask only what affects this choice and future ones: existing stack, hard exclusions, operating constraints, and which tradeoffs matter most.
+
 ## Propose
 
 Propose a memory only when the user:

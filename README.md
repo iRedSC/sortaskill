@@ -23,7 +23,7 @@ Create a private locations index outside this repository:
 
 ```dotenv
 HOMELAB=homelab
-PREFERRED_TOOLS=preferred_tools.md
+MEMORY=/home/you/.memory
 ```
 
 Values may be absolute, or relative to the directory that contains the index file. Do not put credentials in the file or commit it to this repository.
