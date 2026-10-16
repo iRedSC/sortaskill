@@ -91,16 +91,13 @@ class SetupScriptTests(unittest.TestCase):
                     self.assertTrue((home / relative / skill / "SKILL.md").is_file())
 
             locations = home.parent / f"{home.name}-locations.env"
-            injected = (home / ".codex" / "skills" / "unknown-info" / "SKILL.md").read_text(encoding="utf-8")
+            injected = (home / ".codex" / "skills" / "memory" / "SKILL.md").read_text(encoding="utf-8")
             self.assertIn(str(locations.resolve()), injected)
             self.assertIn("Canonical file", injected)
             self.assertNotIn("HOMELAB=/private/homelab/docs", injected)
             self.assertNotIn("Current contents", injected)
-            preferred = (home / ".codex" / "skills" / "preferred-tools" / "SKILL.md").read_text(encoding="utf-8")
-            self.assertIn(str(locations.resolve()), preferred)
-            self.assertNotIn("HOMELAB=/private/homelab/docs", preferred)
-            self.assertIn("location-key: PREFERRED_TOOLS", preferred)
-            self.assertNotIn("locations-index: setup.py replaces", preferred)
+            self.assertIn("location-key: MEMORY", injected)
+            self.assertNotIn("locations-index: setup.py replaces", injected)
             cursor_skill = (home / ".cursor" / "skills" / "global-agents" / "SKILL.md").read_text(encoding="utf-8")
             self.assertTrue(
                 cursor_skill.startswith(
@@ -265,7 +262,7 @@ class SetupScriptTests(unittest.TestCase):
             home = Path(directory)
             first = self.run_setup(home, "--all")
             self.assertEqual(first.returncode, 0, first.stderr)
-            skill = home / ".codex" / "skills" / "unknown-info" / "SKILL.md"
+            skill = home / ".codex" / "skills" / "memory" / "SKILL.md"
             original_mtime = skill.stat().st_mtime_ns
 
             locations = home.parent / f"{home.name}-locations.env"

@@ -21,6 +21,7 @@ End with a **Your call** section listing every decision or action that is mine a
 1. **[!!!]** You are blocked until I answer.
 2. **[!!]** I should act soon, or something breaks or drifts.
 3. **[!]** Optional.
+4. **[M]** A proposed memory, quoted exactly. Only the memory skill adds these.
 
 Omit the section when nothing is mine. Never bury a question above it.
 
